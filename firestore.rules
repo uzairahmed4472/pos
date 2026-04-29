@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && 
+             request.auth.uid == userId;
+    }
+    
+    function hasPermission(resource, action) {
+      return isAuthenticated() && 
+             resource in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isAdmin() || isOwner(userId);
+      allow create: if isAdmin();
+      allow list: if isAdmin();
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      allow read: if isAuthenticated() && 
+                   hasPermission('products', 'view');
+      allow create: if isAuthenticated() && 
+                    hasPermission('products', 'create');
+      allow update: if isAuthenticated() && 
+                    hasPermission('products', 'edit') || isOwner(get(/databases/$(database)/documents/products/$(productId)).data.createdBy);
+      allow delete: if isAuthenticated() && 
+                    hasPermission('products', 'delete') || isOwner(get(/databases/$(database)/documents/products/$(productId)).data.createdBy);
+      allow list: if isAuthenticated() && 
+                  hasPermission('products', 'view');
+    }
+    
+    // Sales collection
+    match /sales/{saleId} {
+      allow read: if isAuthenticated() && 
+                 hasPermission('sales', 'view') || 
+                 isOwner(get(/databases/$(database)/documents/sales/$(saleId)).data.sellerId);
+      allow create: if isAuthenticated() && 
+                    hasPermission('sales', 'create');
+      allow update: if isAuthenticated() && 
+                    hasPermission('sales', 'edit') || 
+                    isOwner(get(/databases/$(database)/documents/sales/$(saleId)).data.sellerId);
+      allow delete: if isAuthenticated() && 
+                    hasPermission('sales', 'delete') || 
+                    isOwner(get(/databases/$(database)/documents/sales/$(saleId)).data.sellerId);
+      allow list: if isAuthenticated() && 
+                  hasPermission('sales', 'view');
+    }
+    
+    // Invoices collection
+    match /invoices/{invoiceId} {
+      allow read: if isAuthenticated() && 
+                 hasPermission('invoices', 'view') || 
+                 isOwner(get(/databases/$(database)/documents/invoices/$(invoiceId)).data.sellerId);
+      allow create: if isAuthenticated() && 
+                    hasPermission('invoices', 'create');
+      allow update: if isAuthenticated() && 
+                    hasPermission('invoices', 'edit') || 
+                    isOwner(get(/databases/$(database)/documents/invoices/$(invoiceId)).data.sellerId);
+      allow delete: if isAuthenticated() && 
+                    hasPermission('invoices', 'delete') || 
+                    isOwner(get(/databases/$(database)/documents/invoices/$(invoiceId)).data.sellerId);
+      allow list: if isAuthenticated() && 
+                  hasPermission('invoices', 'view');
+    }
+    
+    // Purchases collection
+    match /purchases/{purchaseId} {
+      allow read: if isAuthenticated() && 
+                 hasPermission('purchases', 'view') || 
+                 isOwner(get(/databases/$(database)/documents/purchases/$(purchaseId)).data.createdBy);
+      allow create: if isAuthenticated() && 
+                    hasPermission('purchases', 'create');
+      allow update: if isAuthenticated() && 
+                    hasPermission('purchases', 'edit') || 
+                    isOwner(get(/databases/$(database)/documents/purchases/$(purchaseId)).data.createdBy);
+      allow delete: if isAuthenticated() && 
+                    hasPermission('purchases', 'delete') || 
+                    isOwner(get(/databases/$(database)/documents/purchases/$(purchaseId)).data.createdBy);
+      allow list: if isAuthenticated() && 
+                  hasPermission('purchases', 'view');
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
