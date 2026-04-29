@@ -20,7 +20,12 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (userDoc.exists) {
-        return User.fromMap(userDoc.data() as Map<String, dynamic>);
+        final user = User.fromMap(userDoc.data() as Map<String, dynamic>);
+        if (user.role != 'admin' && !user.isActive) {
+          await _firebaseService.signOut();
+          throw Exception('Account is pending admin approval');
+        }
+        return user;
       }
       return null;
     } catch (e) {
@@ -72,13 +77,20 @@ class AuthRepositoryImpl implements AuthRepository {
               edit: false,
               delete: false,
             ),
+            'users': const PermissionSet(
+              view: false,
+              create: false,
+              edit: false,
+              delete: false,
+            ),
           },
         ),
         createdAt: DateTime.now(),
+        isActive: false,
       );
 
       try {
-        await _firebaseService.addDocument('users', user.toMap());
+        await _firebaseService.setDocument('users', user.id, user.toMap());
         print('✅ User document created in Firestore');
       } catch (e) {
         print('❌ Error creating Firestore document: $e');
@@ -124,6 +136,42 @@ class AuthRepositoryImpl implements AuthRepository {
       return null;
     } catch (e) {
       throw Exception('Failed to get current user: $e');
+    }
+  }
+
+  @override
+  Future<List<User>> getSellers() async {
+    try {
+      final query = _firebaseService.usersCollection.where(
+        'role',
+        isEqualTo: 'seller',
+      );
+      final snapshots = await _firebaseService.getDocuments(
+        'users',
+        query: query,
+      );
+      return snapshots.docs
+          .map((doc) => User.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get sellers: $e');
+    }
+  }
+
+  @override
+  Future<void> updateSellerApproval({
+    required String sellerId,
+    required bool isActive,
+    UserPermissions? permissions,
+  }) async {
+    try {
+      final payload = <String, dynamic>{'isActive': isActive};
+      if (permissions != null) {
+        payload['permissions'] = permissions.toMap();
+      }
+      await _firebaseService.updateDocument('users', sellerId, payload);
+    } catch (e) {
+      throw Exception('Failed to update seller approval: $e');
     }
   }
 

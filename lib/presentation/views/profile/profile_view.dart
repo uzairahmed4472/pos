@@ -16,11 +16,12 @@ class ProfileView extends StatelessWidget {
         builder: (authController) {
           final user = authController.currentUser;
           
-          return Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Center(
                   child: CircleAvatar(
                     radius: 50.r,
@@ -56,7 +57,7 @@ class ProfileView extends StatelessWidget {
                 Center(
                   child: Chip(
                     label: Text(
-                      user?.role?.toUpperCase() ?? 'UNKNOWN',
+                      user?.role.toUpperCase() ?? 'UNKNOWN',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14.sp,
@@ -121,7 +122,6 @@ class ProfileView extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Spacer(),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -132,6 +132,7 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
               ],
+              ),
             ),
           );
         },

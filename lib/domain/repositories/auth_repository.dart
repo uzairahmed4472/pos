@@ -6,5 +6,11 @@ abstract class AuthRepository {
   Future<void> signOut();
   Future<void> resetPassword(String email);
   Future<User?> getCurrentUser();
+  Future<List<User>> getSellers();
+  Future<void> updateSellerApproval({
+    required String sellerId,
+    required bool isActive,
+    UserPermissions? permissions,
+  });
   Stream<User?> authStateChanges();
 }

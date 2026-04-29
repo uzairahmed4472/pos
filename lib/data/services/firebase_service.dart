@@ -77,6 +77,14 @@ class FirebaseService {
     return await firestore.collection(collection).add(data);
   }
 
+  Future<void> setDocument(
+    String collection,
+    String documentId,
+    Map<String, dynamic> data,
+  ) async {
+    await firestore.collection(collection).doc(documentId).set(data);
+  }
+
   Future<void> updateDocument(
     String collection,
     String documentId,

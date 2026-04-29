@@ -14,6 +14,7 @@ class AuthController extends GetxController {
   final _currentUser = Rxn<User>();
   final _isLoading = false.obs;
   final _errorMessage = Rxn<String>();
+  final _sellers = <User>[].obs;
 
   User? get currentUser => _currentUser.value;
   bool get isLoading => _isLoading.value;
@@ -21,6 +22,7 @@ class AuthController extends GetxController {
   bool get isAuthenticated => _currentUser.value != null;
   bool get isAdmin => _currentUser.value?.isAdmin ?? false;
   bool get isSeller => _currentUser.value?.isSeller ?? false;
+  List<User> get sellers => _sellers;
 
   @override
   void onInit() {
@@ -44,6 +46,11 @@ class AuthController extends GetxController {
   void _listenToAuthChanges() {
     _authRepository.authStateChanges().listen((user) {
       _currentUser.value = user;
+      if (user?.isAdmin ?? false) {
+        loadSellers();
+      } else {
+        _sellers.clear();
+      }
     });
   }
 
@@ -53,7 +60,14 @@ class AuthController extends GetxController {
       _errorMessage.value = null;
 
       final user = await _authRepository.signIn(email, password);
+      if (user == null) {
+        _errorMessage.value = 'User record not found';
+        return false;
+      }
       _currentUser.value = user;
+      if (user.isAdmin) {
+        await loadSellers();
+      }
       return true;
     } catch (e) {
       _errorMessage.value = 'Sign in failed: $e';
@@ -142,5 +156,42 @@ class AuthController extends GetxController {
 
   bool hasPermission(String module, String action) {
     return _currentUser.value?.hasPermission(module, action) ?? false;
+  }
+
+  Future<void> loadSellers() async {
+    try {
+      if (!isAdmin) return;
+      _isLoading.value = true;
+      _errorMessage.value = null;
+      final allSellers = await _authRepository.getSellers();
+      _sellers.assignAll(allSellers);
+    } catch (e) {
+      _errorMessage.value = 'Failed to load sellers: $e';
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateSellerApproval({
+    required String sellerId,
+    required bool isActive,
+    UserPermissions? permissions,
+  }) async {
+    try {
+      _isLoading.value = true;
+      _errorMessage.value = null;
+      await _authRepository.updateSellerApproval(
+        sellerId: sellerId,
+        isActive: isActive,
+        permissions: permissions,
+      );
+      await loadSellers();
+      return true;
+    } catch (e) {
+      _errorMessage.value = 'Failed to update seller: $e';
+      return false;
+    } finally {
+      _isLoading.value = false;
+    }
   }
 }

@@ -105,7 +105,7 @@ class CreateSaleView extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Colors.grey[500],
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12.r),
                       topRight: Radius.circular(12.r),
@@ -335,191 +335,200 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
         return Dialog(
           child: Container(
             width: 400.w,
+            height: 600.h,
             padding: EdgeInsets.all(24.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Checkout',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Checkout',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  'Customer Information',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
+                  SizedBox(height: 16.h),
+                  Text(
+                    'Customer Information',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                TextField(
-                  controller: _customerController,
-                  decoration: const InputDecoration(
-                    labelText: 'Customer Name (Optional)',
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                TextField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone (Optional)',
-                    prefixIcon: Icon(Icons.phone),
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  'Payment Details',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Obx(
-                  () => DropdownButtonFormField<String>(
-                    value: _paymentMethod.value,
+                  SizedBox(height: 8.h),
+                  TextField(
+                    controller: _customerController,
                     decoration: const InputDecoration(
-                      labelText: 'Payment Method',
-                      prefixIcon: Icon(Icons.payment),
+                      labelText: 'Customer Name (Optional)',
+                      prefixIcon: Icon(Icons.person),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'Cash', child: Text('Cash')),
-                      DropdownMenuItem(value: 'Card', child: Text('Card')),
-                      DropdownMenuItem(value: 'Mobile', child: Text('Mobile')),
-                    ],
-                    onChanged: (value) => _paymentMethod.value = value!,
                   ),
-                ),
-                SizedBox(height: 8.h),
-                TextField(
-                  controller: _discountController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Discount',
-                    prefixIcon: Icon(Icons.discount),
+                  SizedBox(height: 8.h),
+                  TextField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Phone (Optional)',
+                      prefixIcon: Icon(Icons.phone),
+                    ),
                   ),
-                  onChanged: (value) {
-                    final discount = double.tryParse(value) ?? 0.0;
-                    salesController.setDiscount(discount);
-                  },
-                ),
-                SizedBox(height: 8.h),
-                TextField(
-                  controller: _taxController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Tax',
-                    prefixIcon: Icon(Icons.receipt_long),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'Payment Details',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  onChanged: (value) {
-                    final tax = double.tryParse(value) ?? 0.0;
-                    salesController.setTax(tax);
-                  },
-                ),
-                SizedBox(height: 8.h),
-                TextField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Notes (Optional)',
-                    prefixIcon: Icon(Icons.note),
+                  SizedBox(height: 8.h),
+                  Obx(
+                    () => DropdownButtonFormField<String>(
+                      value: _paymentMethod.value,
+                      decoration: const InputDecoration(
+                        labelText: 'Payment Method',
+                        prefixIcon: Icon(Icons.payment),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'Cash', child: Text('Cash')),
+                        DropdownMenuItem(value: 'Card', child: Text('Card')),
+                        DropdownMenuItem(
+                          value: 'Mobile',
+                          child: Text('Mobile'),
+                        ),
+                      ],
+                      onChanged: (value) => _paymentMethod.value = value!,
+                    ),
                   ),
-                  maxLines: 2,
-                  onChanged: salesController.setNotes,
-                ),
-                SizedBox(height: 16.h),
-                Container(
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8.r),
+                  SizedBox(height: 8.h),
+                  TextField(
+                    controller: _discountController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Discount',
+                      prefixIcon: Icon(Icons.discount),
+                    ),
+                    onChanged: (value) {
+                      final discount = double.tryParse(value) ?? 0.0;
+                      salesController.setDiscount(discount);
+                    },
                   ),
-                  child: Column(
+                  SizedBox(height: 8.h),
+                  TextField(
+                    controller: _taxController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Tax',
+                      prefixIcon: Icon(Icons.receipt_long),
+                    ),
+                    onChanged: (value) {
+                      final tax = double.tryParse(value) ?? 0.0;
+                      salesController.setTax(tax);
+                    },
+                  ),
+                  SizedBox(height: 8.h),
+                  TextField(
+                    controller: _notesController,
+                    decoration: const InputDecoration(
+                      labelText: 'Notes (Optional)',
+                      prefixIcon: Icon(Icons.note),
+                    ),
+                    maxLines: 2,
+                    onChanged: salesController.setNotes,
+                  ),
+                  SizedBox(height: 16.h),
+                  Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Subtotal:'),
+                            Text(
+                              Formatters.formatCurrency(
+                                salesController.subtotal,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Discount:'),
+                            Text(
+                              '-${Formatters.formatCurrency(salesController.discount)}',
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Tax:'),
+                            Text(
+                              Formatters.formatCurrency(salesController.tax),
+                            ),
+                          ],
+                        ),
+                        const Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total:',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              Formatters.formatCurrency(
+                                salesController.totalAmount,
+                              ),
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Get.theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Subtotal:'),
-                          Text(
-                            Formatters.formatCurrency(salesController.subtotal),
-                          ),
-                        ],
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('Cancel'),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Discount:'),
-                          Text(
-                            '-${Formatters.formatCurrency(salesController.discount)}',
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Tax:'),
-                          Text(Formatters.formatCurrency(salesController.tax)),
-                        ],
-                      ),
-                      const Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Total:',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            Formatters.formatCurrency(
-                              salesController.totalAmount,
-                            ),
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Get.theme.colorScheme.primary,
-                            ),
-                          ),
-                        ],
+                      SizedBox(width: 8.w),
+                      Obx(
+                        () => ElevatedButton(
+                          onPressed: salesController.isLoading
+                              ? null
+                              : () => _completeSale(salesController),
+                          child: salesController.isLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Complete Sale'),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(height: 16.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Get.back(),
-                      child: const Text('Cancel'),
-                    ),
-                    SizedBox(width: 8.w),
-                    Obx(
-                      () => ElevatedButton(
-                        onPressed: salesController.isLoading
-                            ? null
-                            : () => _completeSale(salesController),
-                        child: salesController.isLoading
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text('Complete Sale'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

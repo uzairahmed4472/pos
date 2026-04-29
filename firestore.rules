@@ -17,14 +17,16 @@ service cloud.firestore {
     }
     
     function hasPermission(resource, action) {
-      return isAuthenticated() && 
-             resource in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions;
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[resource][action] == true;
     }
     
     // Users collection
     match /users/{userId} {
-      allow read, write: if isAdmin() || isOwner(userId);
-      allow create: if isAdmin();
+      allow read: if isAdmin() || isOwner(userId);
+      allow create: if isAdmin() || (isOwner(userId) && request.resource.data.role == 'seller');
+      allow update, delete: if isAdmin() || isOwner(userId);
       allow list: if isAdmin();
     }
     
