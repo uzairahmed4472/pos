@@ -439,7 +439,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                   Container(
                     padding: EdgeInsets.all(12.w),
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: Colors.grey[500],
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Column(
